@@ -1,0 +1,31 @@
+groups:
+  - name: linux-host-alerts
+    rules:
+      - alert: NodeExporterDown
+        expr: up{job="linux-node"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Node exporter unavailable on {{ $labels.instance }}"
+      - alert: HighCpuUsage
+        expr: (1 - avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m]))) * 100 > 85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "CPU utilization above 85% on {{ $labels.instance }}"
+      - alert: HighMemoryUsage
+        expr: (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 > 90
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Memory utilization above 90% on {{ $labels.instance }}"
+      - alert: LowDiskSpace
+        expr: (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs",mountpoint!=""} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs",mountpoint!=""}) * 100 < 10
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Less than 10% free disk space on {{ $labels.instance }} ({{ $labels.mountpoint }})"
