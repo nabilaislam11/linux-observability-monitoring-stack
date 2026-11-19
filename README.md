@@ -51,6 +51,3 @@ The validation script checks running service endpoints and requires the stack to
 - `scripts/`: operational validation
 - `.github/workflows/`: automated static checks
 
-## Scope
-
-This repository is a self-contained educational and engineering lab, not an export of any production monitoring deployment.
