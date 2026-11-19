@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+status="$(docker compose ps --status running --services)"
 for service in prometheus alertmanager node-exporter grafana; do
-  status="$(docker compose ps --status running --services)"
   if ! grep -Fxq "$service" <<< "$status"; then
     echo "FAIL: $service is not running" >&2
     exit 1
@@ -14,8 +14,9 @@ for endpoint in http://127.0.0.1:9090/-/ready http://127.0.0.1:9093/-/ready http
   echo "OK: $endpoint"
 done
 
-curl --fail --silent --show-error --max-time 10 http://127.0.0.1:9090/api/v1/targets | grep -q '"health":"up"' || {
+targets="$(curl --fail --silent --show-error --max-time 10 http://127.0.0.1:9090/api/v1/targets)"
+if ! grep -q '"health":"up"' <<< "$targets"; then
   echo "FAIL: no healthy Prometheus target" >&2
   exit 1
-}
+fi
 echo "PASS: monitoring endpoints and at least one scrape target are healthy"
