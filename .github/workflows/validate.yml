@@ -1,0 +1,19 @@
+name: Validate monitoring configuration
+on:
+  push:
+  pull_request:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare local environment
+        run: cp .env.example .env
+      - name: Validate Compose
+        run: docker compose config --quiet
+      - name: Validate Prometheus configuration
+        run: |
+          docker compose run --rm --no-deps prometheus promtool check config /etc/prometheus/prometheus.yml
+          docker compose run --rm --no-deps prometheus promtool check rules /etc/prometheus/alerts.yml
+      - name: Validate dashboard JSON
+        run: python3 -m json.tool grafana/dashboards/linux-overview.json >/dev/null
