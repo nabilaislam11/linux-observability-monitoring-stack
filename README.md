@@ -68,7 +68,7 @@ The `linux-node` scrape job collects host metrics every 15 seconds. Prometheus e
 | HighMemoryUsage | Memory utilization above 90% | 10 minutes |
 | LowDiskSpace | Available filesystem space below 10% | 10 minutes |
 
-Alertmanager includes a local routing configuration. Configure an appropriate receiver before using external notifications.
+The included Alertmanager configuration handles local routing. External notifications require a configured receiver.
 
 ## Validation
 
